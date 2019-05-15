@@ -14,68 +14,28 @@ namespace OpenVpnConnection
         static void Main(string[] args)
         {
 
+            // initialize
+            OpenVpnConnection.OpenVPNManager vpn = new OpenVpnConnection.OpenVPNManager(@"C:\Program Files\OpenVPN\bin\openvpn-gui.exe");
+
+            // 
+            // connect to vpn\
             try
             {
-                Process.Start("C:\\Program Files\\OpenVPN\bin\\openvpn-gui.exe", $"--connect client");
+
+                vpn.ConnectToOpenVPN();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Process failed to start");
-                Console.ReadKey();
-                return;
+                Console.WriteLine(ex.ToString());
             }
 
-            NetworkInterface vpn_adap = null;
+            Thread.Sleep(10000);
 
-            Console.WriteLine("[+] Searching for Open VPN network adapter... ");
+            vpn.DisconnectFromOpenVPN();
 
-
-            var adapter = NetworkInterface.GetAllNetworkInterfaces();
-
-
-
-
-            foreach (var adapt in adapter)
-            {
-                Console.WriteLine("[i] "+adapt.Name+" [d] "+adapt.Description);
-
-                if (adapt.Description.Contains ("TAP") && adapt.Name.Contains ("Local Area Connection"))
-                {
-                   // Console.WriteLine("FOUND [i] " + adapt.Name + " [d] " + adapt.Description);
-
-                    vpn_adap = adapt;
-
-                    break;
-
-                }
-
-            }
-
-
-            if (vpn_adap == null)
-            {
-                Console.Error.WriteLine("[!] Failed to locate Open VPN Connection");
-                return;
-            }
-
-
-            Console.WriteLine("[+] VPN Adapter located! ");
-
-            Console.WriteLine("[~] Waiting for adapter ...");
-            while (vpn_adap.OperationalStatus != OperationalStatus.Up)
-            {
-
-                Task.Delay(2000);
-
-                Console.Write(".");
-                
-
-            }
-
-            Console.WriteLine("[+] Connection completed! ");
 
             Console.ReadKey();
-
         }
+
     }
 }
